@@ -201,3 +201,4 @@ aria/
 | Date | Change | Phase |
 |---|---|---|
 | 2026-04-17 | Initial project documentation created | Planning |
+| 2026-04-20 | Phase 1 complete — FastAPI backend + Next.js chat UI with SSE streaming | Phase 1 |
