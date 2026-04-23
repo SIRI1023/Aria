@@ -36,7 +36,7 @@ Business users waste hours searching across Notion, Google Drive, Slack, and dat
 | Frontend | Next.js 14 (App Router) | Industry standard for AI product UIs |
 | UI Components | Tailwind CSS + shadcn/ui | Fast, clean, professional |
 | Backend | Python FastAPI | Standard for LLM backends |
-| LLM | Claude API (Anthropic) | With prompt caching for cost efficiency |
+| LLM | Claude API (Anthropic) | claude-haiku-4-5 with prompt caching for cost efficiency |
 | Agent Framework | LangGraph | Graph-based agent loops — current 2025 standard |
 | RAG / Chains | LangChain | Document loading, chunking, retrieval |
 | Vector Database | ChromaDB (local dev) → Pinecone (prod) | Semantic search over knowledge base |
@@ -165,7 +165,7 @@ mcp_servers (id, workspace_id, name, server_url, config, enabled)
 ## Key Interview Talking Points
 
 1. **LangGraph over plain LangChain agents** — explain why graph-based agents handle cycles, retries, and conditional routing better than the legacy AgentExecutor
-2. **Prompt caching** — Claude API caches the system prompt + KB context, reducing cost by ~80% on repeat queries in the same session
+2. **Prompt caching** — Claude API caches the system prompt, reducing cost by ~90% on cache hits for repeated sessions
 3. **Multi-tenant vector isolation** — each workspace gets its own ChromaDB collection; embeddings never cross workspace boundaries
 4. **MCP as an abstraction layer** — instead of hardcoding every integration, MCP gives you a standard protocol, so adding a new tool is a 1-day task not a 2-week project
 5. **Streaming agent traces** — users see the agent's reasoning; this builds trust and is a key differentiator for enterprise adoption
@@ -202,3 +202,4 @@ aria/
 |---|---|---|
 | 2026-04-17 | Initial project documentation created | Planning |
 | 2026-04-20 | Phase 1 complete — FastAPI backend + Next.js chat UI with SSE streaming | Phase 1 |
+| 2026-04-23 | Reverted to Claude API (claude-haiku-4-5) with AsyncAnthropic client and prompt caching | Phase 1 |
