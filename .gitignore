@@ -11,6 +11,10 @@ frontend/.env.local
 frontend/.next/
 frontend/node_modules/
 
+# RAG
+backend/chroma_db/
+backend/uploads/
+
 # General
 .DS_Store
 *.log

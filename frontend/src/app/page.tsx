@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { ChatInput } from "@/components/chat/ChatInput";
-import { streamChat, type Message } from "@/lib/api";
+import { streamChat, type Message, type Citation } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Bot } from "lucide-react";
+import { Bot, BookOpen } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -23,8 +24,7 @@ export default function Home() {
     setMessages(updatedMessages);
     setStreaming(true);
 
-    const assistantMessage: Message = { role: "assistant", content: "" };
-    setMessages([...updatedMessages, assistantMessage]);
+    setMessages([...updatedMessages, { role: "assistant", content: "" }]);
 
     await streamChat(
       updatedMessages,
@@ -38,13 +38,19 @@ export default function Home() {
           return next;
         });
       },
-      () => setStreaming(false)
+      () => setStreaming(false),
+      (citations: Citation[]) => {
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = { ...next[next.length - 1], citations };
+          return next;
+        });
+      }
     );
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b px-6 py-4 flex items-center gap-3 shrink-0">
         <div className="h-9 w-9 rounded-xl bg-violet-600 flex items-center justify-center">
           <Bot className="h-5 w-5 text-white" />
@@ -53,7 +59,14 @@ export default function Home() {
           <h1 className="font-semibold text-gray-900">Aria</h1>
           <p className="text-xs text-gray-500">AI Business Operations Assistant</p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <Link
+            href="/kb"
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-violet-600 transition-colors"
+          >
+            <BookOpen className="h-4 w-4" />
+            Knowledge Base
+          </Link>
           <Badge variant="outline" className="text-xs text-green-600 border-green-300">
             ● Online
           </Badge>
@@ -62,7 +75,6 @@ export default function Home() {
 
       <Separator />
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 max-w-3xl mx-auto w-full">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center gap-3">
@@ -71,7 +83,9 @@ export default function Home() {
             </div>
             <h2 className="text-xl font-semibold text-gray-800">How can I help you today?</h2>
             <p className="text-sm text-gray-500 max-w-sm">
-              Ask me anything, upload documents to search, or give me a multi-step task to execute.
+              Ask me anything, or upload documents to the{" "}
+              <Link href="/kb" className="text-violet-600 hover:underline">Knowledge Base</Link>{" "}
+              to get cited answers.
             </p>
           </div>
         )}
@@ -95,11 +109,10 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <div className="shrink-0 px-4 pb-6 max-w-3xl mx-auto w-full">
         <ChatInput onSend={handleSend} disabled={streaming} />
         <p className="text-xs text-center text-gray-400 mt-2">
-          Aria · Powered by Claude · Phase 1
+          Aria · Powered by Claude · Phase 2
         </p>
       </div>
     </div>

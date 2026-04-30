@@ -17,13 +17,28 @@ export function MessageBubble({ message }: { message: Message }) {
           {isUser ? "You" : "AI"}
         </AvatarFallback>
       </Avatar>
-      <div className={cn(
-        "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
-        isUser
-          ? "bg-blue-600 text-white rounded-tr-sm"
-          : "bg-gray-100 text-gray-900 rounded-tl-sm"
-      )}>
-        {message.content}
+      <div className="flex flex-col gap-1.5 max-w-[75%]">
+        <div className={cn(
+          "rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
+          isUser
+            ? "bg-blue-600 text-white rounded-tr-sm"
+            : "bg-gray-100 text-gray-900 rounded-tl-sm"
+        )}>
+          {message.content}
+        </div>
+        {message.citations && message.citations.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 px-1">
+            {message.citations.map((c, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1 text-xs bg-violet-50 text-violet-700 border border-violet-200 rounded-full px-2 py-0.5"
+              >
+                <span className="font-medium">Source {i + 1}:</span>
+                {c.filename}{c.page > 0 ? `, p.${c.page}` : ""}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
