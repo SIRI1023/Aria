@@ -3,14 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { ChatInput } from "@/components/chat/ChatInput";
-import { streamChat, type Message, type Citation } from "@/lib/api";
+import { AgentTrace } from "@/components/agent/AgentTrace";
+import { streamAgent, type Message, type AgentStep } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Bot, BookOpen } from "lucide-react";
 import Link from "next/link";
 
+type MessageWithTrace = Message & { steps?: AgentStep[] };
+
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageWithTrace[]>([]);
   const [streaming, setStreaming] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -19,33 +22,30 @@ export default function Home() {
   }, [messages]);
 
   const handleSend = async (text: string) => {
-    const userMessage: Message = { role: "user", content: text };
+    const userMessage: MessageWithTrace = { role: "user", content: text };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setStreaming(true);
 
-    setMessages([...updatedMessages, { role: "assistant", content: "" }]);
+    const assistantMsg: MessageWithTrace = { role: "assistant", content: "", steps: [] };
+    setMessages([...updatedMessages, assistantMsg]);
 
-    await streamChat(
+    await streamAgent(
       updatedMessages,
-      (chunk) => {
+      (step: AgentStep) => {
         setMessages((prev) => {
           const next = [...prev];
-          next[next.length - 1] = {
-            ...next[next.length - 1],
-            content: next[next.length - 1].content + chunk,
-          };
+          const last = { ...next[next.length - 1] };
+          if (step.type === "final_answer") {
+            last.content = step.content;
+          } else {
+            last.steps = [...(last.steps || []), step];
+          }
+          next[next.length - 1] = last;
           return next;
         });
       },
-      () => setStreaming(false),
-      (citations: Citation[]) => {
-        setMessages((prev) => {
-          const next = [...prev];
-          next[next.length - 1] = { ...next[next.length - 1], citations };
-          return next;
-        });
-      }
+      () => setStreaming(false)
     );
   };
 
@@ -91,10 +91,18 @@ export default function Home() {
         )}
 
         {messages.map((msg, i) => (
-          <MessageBubble key={i} message={msg} />
+          <div key={i}>
+            {msg.role === "assistant" && msg.steps && msg.steps.length > 0 && (
+              <AgentTrace steps={msg.steps} />
+            )}
+            {(msg.content || msg.role === "user") && (
+              <MessageBubble message={msg} />
+            )}
+          </div>
         ))}
 
-        {streaming && messages[messages.length - 1]?.content === "" && (
+        {streaming && messages[messages.length - 1]?.content === "" &&
+          (messages[messages.length - 1]?.steps?.length ?? 0) === 0 && (
           <div className="flex gap-3 mb-4">
             <div className="h-8 w-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
               <Bot className="h-4 w-4 text-violet-600" />
@@ -112,7 +120,7 @@ export default function Home() {
       <div className="shrink-0 px-4 pb-6 max-w-3xl mx-auto w-full">
         <ChatInput onSend={handleSend} disabled={streaming} />
         <p className="text-xs text-center text-gray-400 mt-2">
-          Aria · Powered by Claude · Phase 2
+          Aria · Powered by Claude + LangGraph · Phase 3
         </p>
       </div>
     </div>
