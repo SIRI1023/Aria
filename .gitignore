@@ -15,6 +15,20 @@ frontend/node_modules/
 backend/chroma_db/
 backend/uploads/
 
+# Aria AI (Phase 2-4 paths)
+Aria AI/backend/.env
+Aria AI/backend/__pycache__/
+Aria AI/backend/**/__pycache__/
+Aria AI/backend/*.pyc
+Aria AI/backend/.venv/
+Aria AI/backend/chroma_db/
+Aria AI/frontend/.env.local
+Aria AI/frontend/.next/
+Aria AI/frontend/node_modules/
+Aria AI/mcp-servers/**/__pycache__/
+
 # General
 .DS_Store
 *.log
+.venv/
+aria/

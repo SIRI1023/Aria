@@ -1,0 +1,20 @@
+# Python
+backend/.env
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/.venv/
+backend/venv/
+
+# Next.js
+frontend/.env.local
+frontend/.next/
+frontend/node_modules/
+
+# RAG
+backend/chroma_db/
+backend/uploads/
+
+# General
+.DS_Store
+*.log

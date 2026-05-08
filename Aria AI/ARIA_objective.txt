@@ -1,0 +1,186 @@
+What Aria Currently Is (Phase 1 plan)
+
+  A chat interface that talks to Claude. That's it. Not unique at all — Claude.ai does this for free.
+
+  Phase 2 as originally planned (upload PDF, ask questions) is also heavily commoditized:
+  - ChatPDF, Chatbase, Mendable, Notion AI, Microsoft Copilot all do this
+  - "Chat with your documents" is the most copied LLM app pattern of 2024
+
+  ---
+  What Would Make Aria Actually Unique
+
+  The market gap isn't in answering questions from documents. It's in taking actions across multiple business tools, transparently, with human oversight.
+
+  Here's the honest landscape:
+
+  ┌─────────────────────┬──────────────────────────┬──────────────────────────────┐
+  │        Tool         │       What it does       │             Gap              │
+  ├─────────────────────┼──────────────────────────┼──────────────────────────────┤
+  │ ChatGPT / Claude.ai │ General Q&A              │ No business tool connections │
+  ├─────────────────────┼──────────────────────────┼──────────────────────────────┤
+  │ Notion AI           │ AI inside Notion only    │ Locked to one tool           │
+  ├─────────────────────┼──────────────────────────┼──────────────────────────────┤
+  │ Microsoft Copilot   │ AI inside Microsoft only │ Locked to Microsoft stack    │
+  ├─────────────────────┼──────────────────────────┼──────────────────────────────┤
+  │ Glean               │ Search across tools      │ Read-only, no actions        │
+  ├─────────────────────┼──────────────────────────┼──────────────────────────────┤
+  │ Chatbase            │ Chat with docs           │ No live data, no actions     │
+  └─────────────────────┴──────────────────────────┴──────────────────────────────┘
+
+  The gap: No tool gives a small/mid-size business an AI that can read AND write across all their tools (Notion, Slack, Google Drive, databases) through an open standard (MCP) with visible reasoning so users
+  trust it.
+
+  ---
+  What Aria Should Actually Be
+
+  "An AI operations agent that connects to your business tools via MCP, answers questions from live data, executes multi-step tasks, and shows you exactly how it thinks — so you can trust it."
+
+  The three things that make it defensible:
+
+  1. MCP as the integration backbone (Phase 4)
+  Instead of hardcoding Notion, Slack, Drive connectors like everyone else — you use the Model Context Protocol (open standard by Anthropic). Any tool with an MCP server plugs in instantly. This is the
+  architectural bet that makes Aria extensible without re-engineering.
+
+  Interview talking point: "I built the integration layer on MCP instead of custom connectors — adding a new tool takes hours not weeks, and the agent automatically discovers what tools can do."
+
+  2. Transparent multi-agent reasoning (Phase 3)
+  Most AI tools are black boxes. Aria shows the agent's plan, each tool call, and each decision in real-time in the UI. This is a trust feature that enterprise buyers specifically ask for.
+
+  Interview talking point: "I built a streaming agent trace viewer — users see the planner decompose the task, watch each tool execution, and can intervene before the agent takes action."
+
+  3. Action-capable, not just read-only (Phase 3+4)
+  Aria doesn't just answer "what are my open Notion tasks?" — it can say "here are your 5 open tasks, want me to prioritize and assign deadlines?" and execute that with approval. Read + write with
+  human-in-the-loop.
+
+  ---
+  What This Means for Your Build Plan
+
+  Phase 2 (RAG) still matters, but reframe it:
+
+  ┌──────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │           Old framing            │                                                    New framing                                                     │
+  ├──────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ "Upload a PDF and ask questions" │ "Aria indexes your knowledge base and retrieves context to ground agent answers — citations prevent hallucination" │
+  └──────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  RAG is the grounding infrastructure for the agent, not the product feature. The product feature is the agent that uses RAG + live tools together.
+
+  The pipeline that impresses engineers:
+
+  User task → LangGraph Planner → selects tools →
+    ├── RAG (ChromaDB) — searches knowledge base
+    ├── MCP tool (Notion) — reads live data
+    ├── MCP tool (Slack) — queries threads
+    └── Synthesizer → streams cited answer + shows trace
+
+  That's a backend pipeline worth talking about in interviews. Each layer has a real engineering reason to exist.
+
+  ---
+  My Recommendation
+
+  Build Phase 2 (RAG) as planned but keep it lean — it's infrastructure, not the product showcase. The thing that will get you hired is Phase 3 (LangGraph agent + streaming traces) and Phase 4 (MCP servers).
+  Those are what put you ahead of 95% of candidates who have only built "chat with documents" apps.
+
+  Does this framing resonate? Want to adjust the product direction before we continue?
+
+✻ Cooked for 44s
+
+❯ ok I understand, overall we are doing something solid as per infrastructure but let's looks this as bussiness user point of view and say how it is beneficial to them
+
+● Great shift in thinking. Let me walk through this as a business user.
+
+  ---
+  The Real Problem Business Users Have Every Day
+
+  A typical operations manager, sales rep, or team lead works across 6-10 tools simultaneously:
+
+  Notion (docs/projects) + Slack (conversations) + Google Drive (files)
+  + Jira (tickets) + CRM (customers) + Spreadsheets (data)
+
+  Their day looks like this:
+  - Spend 30 min searching Slack for a decision made 2 weeks ago
+  - Manually copy-paste data from Jira into a spreadsheet to make a report
+  - Ask 3 colleagues "where is the onboarding doc?" because nobody remembers
+  - Click through 20 Notion tasks one by one to update statuses
+  - Miss context because the answer lives in a thread they weren't part of
+
+  This is death by a thousand context switches. Nobody sells a solution to this — they sell tools that add to the problem.
+
+  ---
+  What Aria Does For Them — In Plain English
+
+  Scenario 1 — The Operations Manager
+
+  ▎ "What did we decide about the Q2 hiring plan and who is responsible?"
+
+  Without Aria: Search Notion, search Slack, ask 2 people, find a doc from 3 months ago, still not sure if it's the latest version. Takes 20 minutes.
+
+  With Aria: Asks the question, gets a cited answer in 10 seconds: "The Q2 hiring plan was finalized on March 12 (Notion: Q2 Planning doc). Sarah owns engineering hires, Marcus owns sales. 3 roles are still
+  open (Slack: #hiring, April 2)."
+
+  ---
+  Scenario 2 — The Team Lead
+
+  ▎ "Summarize all blockers from last week's standups and create follow-up tasks"
+
+  Without Aria: Read every standup note, manually create 8 Jira tickets, 45 minutes of admin work.
+
+  With Aria: One message. Agent reads the standup notes from Notion, identifies blockers, drafts the tasks, shows them to the lead for approval, creates them on confirmation. 2 minutes.
+
+  ---
+  Scenario 3 — The Sales Rep
+
+  ▎ "What did we last promise Acme Corp and what's still outstanding?"
+
+  Without Aria: Dig through CRM notes, Slack DMs, email threads, meeting docs. 30+ minutes, still incomplete.
+
+  With Aria: Instant answer with citations from every source — so the rep walks into the call prepared.
+
+  ---
+  Scenario 4 — The New Hire
+
+  ▎ "What's our process for handling customer escalations?"
+
+  Without Aria: Ask a colleague, get pointed to 3 different Notion pages, still confused.
+
+  With Aria: Gets the exact policy with citations, plus related Slack examples of how it was handled in practice.
+
+  ---
+  The Business Value in Numbers
+
+  ┌────────────────────────────────────────┬─────────────────────────┬──────────────────────────────┐
+  │                Problem                 │     Time lost/week      │       Aria's solution        │
+  ├────────────────────────────────────────┼─────────────────────────┼──────────────────────────────┤
+  │ Searching for information across tools │ 5-8 hours               │ Single query, cited answer   │
+  ├────────────────────────────────────────┼─────────────────────────┼──────────────────────────────┤
+  │ Manual report compilation              │ 3-5 hours               │ Agent executes automatically │
+  ├────────────────────────────────────────┼─────────────────────────┼──────────────────────────────┤
+  │ Repeating answers to teammates         │ 2-3 hours               │ Knowledge base answers it    │
+  ├────────────────────────────────────────┼─────────────────────────┼──────────────────────────────┤
+  │ Manual task updates/creation           │ 2-4 hours               │ Agent executes with approval │
+  ├────────────────────────────────────────┼─────────────────────────┼──────────────────────────────┤
+  │ Total                                  │ 12-20 hours/person/week │                              │
+  └────────────────────────────────────────┴─────────────────────────┴──────────────────────────────┘
+
+  At a 10-person team, that's recovering 100-200 hours per week of productive work. That's the business case.
+
+  ---
+  Why It's Not Already Solved
+
+  - Notion AI — only knows what's in Notion. Can't see Slack, Drive, your database.
+  - Microsoft Copilot — only works if your company is 100% Microsoft. Expensive license.
+  - Glean — searches across tools but read-only. Can't take actions. Enterprise pricing ($$$).
+  - ChatGPT — no connection to your tools at all. You paste context manually.
+
+  Aria is the first tool that:
+  1. Works across any tool (because MCP is an open standard)
+  2. Can both read and act (not just search)
+  3. Shows its reasoning (so users trust it before it acts)
+  4. Is affordable for small/mid businesses (not Glean's $50k/year enterprise contracts)
+
+  ---
+  The One-Line Pitch
+
+  "Aria is the AI that knows everything in your business tools and can act on it — so your team stops wasting half their day searching and clicking."
+
+  That's the product. The RAG pipeline, LangGraph agents, and MCP servers are how you build it.
