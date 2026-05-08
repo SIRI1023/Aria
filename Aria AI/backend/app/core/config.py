@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
     chroma_db_path: str = "./chroma_db"
     notion_api_key: str = ""
+    google_calendar_credentials_path: str = "../mcp-servers/google-calendar/credentials.json"
 
     class Config:
         env_file = ".env"
