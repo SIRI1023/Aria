@@ -2,6 +2,7 @@ from langchain_core.tools import tool
 from app.rag.retrieval import retrieve_context
 from app.mcp.notion_tools import NOTION_TOOLS
 from app.mcp.gcal_tools import GCAL_TOOLS
+from app.mcp.gmail_tools import GMAIL_TOOLS
 
 
 @tool
@@ -29,4 +30,4 @@ def calculate(expression: str) -> str:
         return f"Error evaluating expression: {e}"
 
 
-TOOLS = [search_knowledge_base, calculate] + NOTION_TOOLS + GCAL_TOOLS
+TOOLS = [search_knowledge_base, calculate] + NOTION_TOOLS + GCAL_TOOLS + GMAIL_TOOLS

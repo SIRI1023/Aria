@@ -18,6 +18,7 @@ backend/uploads/
 # Google OAuth (never commit these)
 mcp-servers/google-calendar/credentials.json
 mcp-servers/google-calendar/token.json
+mcp-servers/gmail/token.json
 
 # General
 .DS_Store

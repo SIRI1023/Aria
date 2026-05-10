@@ -29,6 +29,11 @@ Use gcal_create_event when the user wants to schedule or create a new calendar e
 Use gcal_find_free_slots when the user wants to know when they are free or needs to
 find a good time to schedule something.
 
+Use gmail_list_emails when the user wants to see recent emails or check their inbox.
+Use gmail_search_emails when the user asks about emails from a specific person,
+about a specific topic, or using any search criteria.
+Use gmail_get_email to read the full body of a specific email after finding its ID.
+
 Use search_knowledge_base when the user asks about files or documents they uploaded
 directly to Aria (PDFs, text files) — not Notion content.
 
